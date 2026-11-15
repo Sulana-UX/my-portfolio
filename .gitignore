@@ -1,0 +1,8 @@
+# original full-size photo (the site uses me-cutout.png)
+me.png
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
