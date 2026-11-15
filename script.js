@@ -82,10 +82,35 @@ rows.forEach((row) => {
     : { x: (v) => (wp.style.left = `${v}px`), y: (v) => (wp.style.top = `${v}px`) };
   const list = document.querySelector('.rows');
   const isMouse = (e) => e.pointerType === 'mouse' || e.pointerType === 'pen';
-  list.addEventListener('pointermove', (e) => { if (isMouse(e)) { move.x(e.clientX); move.y(e.clientY); } });
+  // lean a little in the direction of movement, then settle
+  const lean = window.gsap ? gsap.quickTo(wp, 'rotation', { duration: 0.5, ease: 'power3' }) : () => {};
+  let lastX = 0, settle;
+  // horizontal spot: the empty gap just left of the description column, with a little drift
+  const gapX = (e) => {
+    const cat = list.querySelector('.row .cat');
+    const right = cat ? cat.getBoundingClientRect().left - 40 : innerWidth / 2 + wp.offsetWidth / 2;
+    return right - wp.offsetWidth + (e.clientX - innerWidth / 2) * 0.03;
+  };
+  // vertical spot: centred on the hovered row, drifting slightly with the cursor
+  const gapY = (e) => {
+    const row = e.target.closest && e.target.closest('.row');
+    if (!row) return e.clientY;
+    const r = row.getBoundingClientRect(), mid = r.top + r.height / 2;
+    return mid + (e.clientY - mid) * 0.25;
+  };
+  const place = (e) => { move.x(gapX(e)); move.y(gapY(e)); };
+  list.addEventListener('pointermove', (e) => {
+    if (!isMouse(e)) return;
+    place(e);
+    if (!reduceMotion) {
+      lean(Math.max(-8, Math.min(8, (e.clientX - lastX) * 0.4)));
+      clearTimeout(settle); settle = setTimeout(() => lean(0), 90);
+    }
+    lastX = e.clientX;
+  });
   rows.forEach((row, i) => row.addEventListener('pointerenter', (e) => {
     if (!isMouse(e)) return;
-    move.x(e.clientX); move.y(e.clientY);
+    place(e);
     wpTrack.style.transform = `translateY(${-i * 100}%)`;
     wp.classList.add('show');
     document.body.classList.add('previewing');
