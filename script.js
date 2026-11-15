@@ -74,13 +74,18 @@ rows.forEach((row) => {
   wpTrack.insertAdjacentHTML('beforeend', `<img src="${src}" alt="" loading="lazy" decoding="async">`);
   row.insertAdjacentHTML('beforeend', `<img class="row-thumb" src="${src}" alt="${alt}" loading="lazy" decoding="async">`);
 });
-if (finePointer && !reduceMotion) {
+{
+  // decide per event (mouse/pen only), so touch-screen laptops still get the preview
+  const dur = reduceMotion ? 0.01 : 0.6;
   const move = window.gsap
-    ? { x: gsap.quickTo(wp, 'x', { duration: 0.6, ease: 'power3' }), y: gsap.quickTo(wp, 'y', { duration: 0.6, ease: 'power3' }) }
+    ? { x: gsap.quickTo(wp, 'x', { duration: dur, ease: 'power3' }), y: gsap.quickTo(wp, 'y', { duration: dur, ease: 'power3' }) }
     : { x: (v) => (wp.style.left = `${v}px`), y: (v) => (wp.style.top = `${v}px`) };
   const list = document.querySelector('.rows');
-  list.addEventListener('pointermove', (e) => { move.x(e.clientX); move.y(e.clientY); });
-  rows.forEach((row, i) => row.addEventListener('pointerenter', () => {
+  const isMouse = (e) => e.pointerType === 'mouse' || e.pointerType === 'pen';
+  list.addEventListener('pointermove', (e) => { if (isMouse(e)) { move.x(e.clientX); move.y(e.clientY); } });
+  rows.forEach((row, i) => row.addEventListener('pointerenter', (e) => {
+    if (!isMouse(e)) return;
+    move.x(e.clientX); move.y(e.clientY);
     wpTrack.style.transform = `translateY(${-i * 100}%)`;
     wp.classList.add('show');
     document.body.classList.add('previewing');
