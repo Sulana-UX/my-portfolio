@@ -2,6 +2,66 @@ const hasGsap = !!(window.gsap && window.ScrollTrigger);
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(pointer: fine)').matches;
 
+/* ---------- mini mail composer (opens on the same page) ----------
+   Messages are delivered by FormSubmit (formsubmit.co). The very first message
+   triggers a one-time activation email to the address below — click the link in it. */
+const MAIL_TO = 'sulanav02@gmail.com';
+const composer = document.getElementById('composer');
+const cForm = document.getElementById('composerForm');
+const cStatus = document.getElementById('composerStatus');
+const cSend = document.getElementById('composerSend');
+const cDone = document.getElementById('composerDone');
+let lastTrigger = null;
+
+function openComposer(e) {
+  e.preventDefault();
+  lastTrigger = e.currentTarget;
+  composer.hidden = false;
+  requestAnimationFrame(() => composer.classList.add('open'));
+  setTimeout(() => cForm.name.focus({ preventScroll: true }), 250);
+}
+function closeComposer() {
+  composer.classList.remove('open');
+  setTimeout(() => {
+    composer.hidden = true;
+    cForm.hidden = false; cDone.hidden = true; cStatus.textContent = '';
+  }, 300);
+  if (lastTrigger) lastTrigger.focus({ preventScroll: true });
+}
+document.querySelectorAll('a[data-email]').forEach((a) => a.addEventListener('click', openComposer));
+document.getElementById('composerClose').addEventListener('click', closeComposer);
+document.getElementById('composerAgain').addEventListener('click', closeComposer);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !composer.hidden) closeComposer(); });
+
+cForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!cForm.checkValidity()) {
+    cStatus.textContent = 'Please add your name, a valid email and a message.';
+    cForm.querySelector(':invalid').focus();
+    return;
+  }
+  const data = Object.fromEntries(new FormData(cForm));
+  if (data._honey) return;                       // bot
+  cSend.disabled = true;
+  cStatus.textContent = 'Sending…';
+  try {
+    const res = await fetch(`https://formsubmit.co/ajax/${MAIL_TO}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ ...data, _replyto: data.email, _template: 'table', _captcha: 'false' }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || String(json.success) === 'false') throw new Error(json.message || 'failed');
+    cForm.reset();
+    cStatus.textContent = '';
+    cForm.hidden = true; cDone.hidden = false;
+  } catch (err) {
+    cStatus.innerHTML = `Couldn't send right now. Please email me at <a href="mailto:${MAIL_TO}">${MAIL_TO}</a>.`;
+  } finally {
+    cSend.disabled = false;
+  }
+});
+
 /* ---------- split text helpers ---------- */
 document.querySelectorAll('.name .word').forEach((w) => {
   w.innerHTML = [...w.textContent].map((c) => `<span class="ch">${c}</span>`).join('');
