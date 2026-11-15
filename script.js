@@ -62,6 +62,35 @@ cForm.addEventListener('submit', async (e) => {
   }
 });
 
+/* ---------- project screenshot preview ----------
+   Computer: a card follows the cursor over the work list and slides between screenshots.
+   Phone: each row shows its screenshot inline. */
+const rows = [...document.querySelectorAll('.row[data-img]')];
+const wp = document.getElementById('workPreview');
+const wpTrack = document.getElementById('wpTrack');
+rows.forEach((row) => {
+  const src = row.dataset.img;
+  const alt = `${row.querySelector('.title').textContent} preview`;
+  wpTrack.insertAdjacentHTML('beforeend', `<img src="${src}" alt="" loading="lazy" decoding="async">`);
+  row.insertAdjacentHTML('beforeend', `<img class="row-thumb" src="${src}" alt="${alt}" loading="lazy" decoding="async">`);
+});
+if (finePointer && !reduceMotion) {
+  const move = window.gsap
+    ? { x: gsap.quickTo(wp, 'x', { duration: 0.6, ease: 'power3' }), y: gsap.quickTo(wp, 'y', { duration: 0.6, ease: 'power3' }) }
+    : { x: (v) => (wp.style.left = `${v}px`), y: (v) => (wp.style.top = `${v}px`) };
+  const list = document.querySelector('.rows');
+  list.addEventListener('pointermove', (e) => { move.x(e.clientX); move.y(e.clientY); });
+  rows.forEach((row, i) => row.addEventListener('pointerenter', () => {
+    wpTrack.style.transform = `translateY(${-i * 100}%)`;
+    wp.classList.add('show');
+    document.body.classList.add('previewing');
+  }));
+  list.addEventListener('pointerleave', () => {
+    wp.classList.remove('show');
+    document.body.classList.remove('previewing');
+  });
+}
+
 /* ---------- split text helpers ---------- */
 document.querySelectorAll('.name .word').forEach((w) => {
   w.innerHTML = [...w.textContent].map((c) => `<span class="ch">${c}</span>`).join('');

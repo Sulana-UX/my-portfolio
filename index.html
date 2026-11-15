@@ -9,6 +9,31 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <!-- favicon -->
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#0d0d0d">
+
+  <!-- social preview (LinkedIn, WhatsApp, Facebook, X) -->
+  <link rel="canonical" href="https://sulana-ux.github.io/my-portfolio/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sulana-ux.github.io/my-portfolio/">
+  <meta property="og:title" content="Sulana Uduwana — Software Engineer">
+  <meta property="og:description" content="Full-stack web & mobile apps, built with a security-first mindset. See my projects: Cineverse, TraceMind AI and ExpenseWise.">
+  <meta property="og:image" content="https://sulana-ux.github.io/my-portfolio/assets/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Sulana Uduwana — Software Engineer">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sulana Uduwana — Software Engineer">
+  <meta name="twitter:description" content="Full-stack web & mobile apps, built with a security-first mindset.">
+  <meta name="twitter:image" content="https://sulana-ux.github.io/my-portfolio/assets/og-image.jpg">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Person","name":"Sulana Uduwana","jobTitle":"Software Engineer",
+   "url":"https://sulana-ux.github.io/my-portfolio/","image":"https://sulana-ux.github.io/my-portfolio/assets/og-image.jpg",
+   "sameAs":["https://github.com/Sulana-UX","https://www.linkedin.com/in/sulana-uduwana"]}
+  </script>
 </head>
 <body>
 
@@ -56,7 +81,7 @@
     </div>
 
     <div class="photo" id="photo">
-      <img src="me-cutout.png" alt="Portrait of Sulana Uduwana">
+      <img src="me-cutout.webp" alt="Portrait of Sulana Uduwana" width="900" height="859" fetchpriority="high">
     </div>
   </section>
 
@@ -89,9 +114,9 @@
   <section id="work" class="work">
     <p class="label">(02) — Selected Work</p>
     <ul class="rows">
-      <li><a href="https://cineverse-ashy-nine.vercel.app/" target="_blank" rel="noopener" class="row"><span class="num">01</span><span class="title">Cineverse</span><span class="cat"><em class="live">● Live demo</em> Cinema booking · React, Express, Supabase</span><span class="year">2026</span><span class="arrow">↗</span></a></li>
-      <li><a href="https://github.com/Sulana-UX/TraceMind-AI" target="_blank" rel="noopener" class="row"><span class="num">02</span><span class="title">TraceMind AI</span><span class="cat">Digital forensics · Python, ML</span><span class="year">2026</span><span class="arrow">↗</span></a></li>
-      <li><a href="https://github.com/Sulana-UX/ExpenseWise" target="_blank" rel="noopener" class="row"><span class="num">03</span><span class="title">ExpenseWise</span><span class="cat">Secure finance app · Flutter, FastAPI</span><span class="year">2026</span><span class="arrow">↗</span></a></li>    </ul>
+      <li><a href="https://cineverse-ashy-nine.vercel.app/" target="_blank" rel="noopener" class="row" data-img="assets/cineverse.webp"><span class="num">01</span><span class="title">Cineverse</span><span class="cat"><em class="live">● Live demo</em> Cinema booking · React, Express, Supabase</span><span class="year">2026</span><span class="arrow">↗</span></a></li>
+      <li><a href="https://github.com/Sulana-UX/TraceMind-AI" target="_blank" rel="noopener" class="row" data-img="assets/tracemind.webp"><span class="num">02</span><span class="title">TraceMind AI</span><span class="cat">Digital forensics · Python, ML</span><span class="year">2026</span><span class="arrow">↗</span></a></li>
+      <li><a href="https://github.com/Sulana-UX/ExpenseWise" target="_blank" rel="noopener" class="row" data-img="assets/expensewise.webp"><span class="num">03</span><span class="title">ExpenseWise</span><span class="cat">Secure finance app · Flutter, FastAPI</span><span class="year">2026</span><span class="arrow">↗</span></a></li>    </ul>
   </section>
 
   <!-- ================= CONTACT ================= -->
@@ -104,6 +129,9 @@
       <span class="links"><a href="https://www.linkedin.com/in/sulana-uduwana" target="_blank" rel="noopener">LinkedIn</a><a href="https://github.com/Sulana-UX" target="_blank" rel="noopener">GitHub</a></span>
     </div>
   </section>
+
+  <!-- floating project preview (follows the cursor over the work list) -->
+  <div class="work-preview" id="workPreview" aria-hidden="true"><div class="wp-track" id="wpTrack"></div></div>
 
   <!-- ================= MINI MAIL COMPOSER ================= -->
   <div class="composer" id="composer" role="dialog" aria-modal="false" aria-labelledby="composerTitle" hidden>
