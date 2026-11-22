@@ -62,6 +62,66 @@ cForm.addEventListener('submit', async (e) => {
   }
 });
 
+/* ---------- project galleries + full-screen viewer ---------- */
+document.querySelectorAll('.project').forEach((card) => {
+  const main = card.querySelector('.p-main');
+  const count = card.querySelector('.p-count');
+  const thumbs = [...card.querySelectorAll('.p-thumb')];
+  const total = String(thumbs.length).padStart(2, '0');
+  card._show = (i) => {
+    const t = thumbs[i];
+    if (!t || t.classList.contains('on')) return;
+    thumbs.forEach((x) => x.classList.toggle('on', x === t));
+    main.classList.add('swap');
+    const img = new Image();
+    img.onload = () => { main.src = t.dataset.src; main.classList.remove('swap'); };
+    img.src = t.dataset.src;
+    count.textContent = `${String(i + 1).padStart(2, '0')} / ${total}`;
+  };
+  thumbs.forEach((t, i) => t.addEventListener('click', () => card._show(i)));
+  card.querySelector('.p-expand').addEventListener('click', () => openLightbox(card, thumbs.findIndex((t) => t.classList.contains('on'))));
+  main.style.cursor = 'zoom-in';
+  main.addEventListener('click', () => openLightbox(card, thumbs.findIndex((t) => t.classList.contains('on'))));
+});
+
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+const lbCount = document.getElementById('lbCount');
+let lbCard = null, lbIndex = 0, lbOpener = null;
+function lbSrcs() { return [...lbCard.querySelectorAll('.p-thumb')].map((t) => t.dataset.src); }
+function lbRender() {
+  const srcs = lbSrcs();
+  lbIndex = (lbIndex + srcs.length) % srcs.length;
+  lbImg.src = srcs[lbIndex];
+  lbImg.alt = lbCard.querySelectorAll('.p-thumb')[lbIndex].getAttribute('aria-label').replace(/^Show /, '');
+  lbCount.textContent = `${lbIndex + 1} / ${srcs.length}`;
+  lbCard._show(lbIndex);
+}
+function openLightbox(card, i) {
+  lbCard = card; lbIndex = i; lbOpener = document.activeElement;
+  lbRender();
+  lb.hidden = false;
+  requestAnimationFrame(() => lb.classList.add('open'));
+  document.documentElement.style.overflow = 'hidden';
+  document.getElementById('lbClose').focus({ preventScroll: true });
+}
+function closeLightbox() {
+  lb.classList.remove('open');
+  document.documentElement.style.overflow = '';
+  setTimeout(() => { lb.hidden = true; }, 300);
+  if (lbOpener) lbOpener.focus({ preventScroll: true });
+}
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lbPrev').addEventListener('click', () => { lbIndex--; lbRender(); });
+document.getElementById('lbNext').addEventListener('click', () => { lbIndex++; lbRender(); });
+lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
+document.addEventListener('keydown', (e) => {
+  if (lb.hidden) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') { lbIndex--; lbRender(); }
+  if (e.key === 'ArrowRight') { lbIndex++; lbRender(); }
+});
+
 /* ---------- split text helpers ---------- */
 document.querySelectorAll('.name .word').forEach((w) => {
   w.innerHTML = [...w.textContent].map((c) => `<span class="ch">${c}</span>`).join('');
@@ -174,18 +234,21 @@ function initAnimations() {
     scrollTrigger: { trigger: '.work-head', start: 'top 85%' },
   });
   const cards = gsap.utils.toArray('.project');
+  // a card taller than the screen would hide its bottom while stuck, so let those scroll normally
+  const fitSticky = () => cards.forEach((c) => c.classList.toggle('no-stick', c.offsetHeight > innerHeight - 110));
+  fitSticky(); addEventListener('resize', fitSticky);
   cards.forEach((card, i) => {
     // content slides in when the card arrives
-    gsap.from(card.querySelectorAll('.p-top, .p-title, .p-tagline, .p-desc, .p-tags, .p-links'), {
-      y: 40, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.07,
+    gsap.from(card.querySelectorAll('.p-badge, .p-title, .p-desc, .p-sub, .p-feats li, .p-tags, .p-links'), {
+      y: 30, opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.05, clearProps: 'opacity,transform',
       scrollTrigger: { trigger: card, start: 'top 75%' },
     });
-    gsap.from(card.querySelector('.p-window'), {
-      y: 80, opacity: 0, duration: 1.3, ease: 'expo.out',
+    gsap.from(card.querySelector('.p-stage'), {
+      y: 70, opacity: 0, scale: 0.96, duration: 1.3, ease: 'expo.out',
       scrollTrigger: { trigger: card, start: 'top 75%' },
     });
-    gsap.from(card.querySelector('.p-float'), {
-      y: 60, x: 30, opacity: 0, duration: 1.3, delay: 0.25, ease: 'expo.out',
+    gsap.from(card.querySelector('.p-thumbs'), {
+      y: 20, opacity: 0, duration: 0.8, ease: 'expo.out', delay: 0.3, clearProps: 'all',
       scrollTrigger: { trigger: card, start: 'top 75%' },
     });
     // on larger screens the card shrinks and dims as the next one slides over it
