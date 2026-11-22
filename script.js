@@ -62,65 +62,6 @@ cForm.addEventListener('submit', async (e) => {
   }
 });
 
-/* ---------- project screenshot preview ----------
-   Computer: a card follows the cursor over the work list and slides between screenshots.
-   Phone: each row shows its screenshot inline. */
-const rows = [...document.querySelectorAll('.row[data-img]')];
-const wp = document.getElementById('workPreview');
-const wpTrack = document.getElementById('wpTrack');
-rows.forEach((row) => {
-  const src = row.dataset.img;
-  const alt = `${row.querySelector('.title').textContent} preview`;
-  wpTrack.insertAdjacentHTML('beforeend', `<img src="${src}" alt="" loading="lazy" decoding="async">`);
-  row.insertAdjacentHTML('beforeend', `<img class="row-thumb" src="${src}" alt="${alt}" loading="lazy" decoding="async">`);
-});
-{
-  // decide per event (mouse/pen only), so touch-screen laptops still get the preview
-  const dur = reduceMotion ? 0.01 : 0.6;
-  const move = window.gsap
-    ? { x: gsap.quickTo(wp, 'x', { duration: dur, ease: 'power3' }), y: gsap.quickTo(wp, 'y', { duration: dur, ease: 'power3' }) }
-    : { x: (v) => (wp.style.left = `${v}px`), y: (v) => (wp.style.top = `${v}px`) };
-  const list = document.querySelector('.rows');
-  const isMouse = (e) => e.pointerType === 'mouse' || e.pointerType === 'pen';
-  // lean a little in the direction of movement, then settle
-  const lean = window.gsap ? gsap.quickTo(wp, 'rotation', { duration: 0.5, ease: 'power3' }) : () => {};
-  let lastX = 0, settle;
-  // horizontal spot: the empty gap just left of the description column, with a little drift
-  const gapX = (e) => {
-    const cat = list.querySelector('.row .cat');
-    const right = cat ? cat.getBoundingClientRect().left - 40 : innerWidth / 2 + wp.offsetWidth / 2;
-    return right - wp.offsetWidth + (e.clientX - innerWidth / 2) * 0.03;
-  };
-  // vertical spot: centred on the hovered row, drifting slightly with the cursor
-  const gapY = (e) => {
-    const row = e.target.closest && e.target.closest('.row');
-    if (!row) return e.clientY;
-    const r = row.getBoundingClientRect(), mid = r.top + r.height / 2;
-    return mid + (e.clientY - mid) * 0.25;
-  };
-  const place = (e) => { move.x(gapX(e)); move.y(gapY(e)); };
-  list.addEventListener('pointermove', (e) => {
-    if (!isMouse(e)) return;
-    place(e);
-    if (!reduceMotion) {
-      lean(Math.max(-8, Math.min(8, (e.clientX - lastX) * 0.4)));
-      clearTimeout(settle); settle = setTimeout(() => lean(0), 90);
-    }
-    lastX = e.clientX;
-  });
-  rows.forEach((row, i) => row.addEventListener('pointerenter', (e) => {
-    if (!isMouse(e)) return;
-    place(e);
-    wpTrack.style.transform = `translateY(${-i * 100}%)`;
-    wp.classList.add('show');
-    document.body.classList.add('previewing');
-  }));
-  list.addEventListener('pointerleave', () => {
-    wp.classList.remove('show');
-    document.body.classList.remove('previewing');
-  });
-}
-
 /* ---------- split text helpers ---------- */
 document.querySelectorAll('.name .word').forEach((w) => {
   w.innerHTML = [...w.textContent].map((c) => `<span class="ch">${c}</span>`).join('');
@@ -225,8 +166,42 @@ function initAnimations() {
     scrollTrigger: { trigger: '.statement', start: 'top 80%', end: 'bottom 45%', scrub: true },
   });
 
+  /* ---------- projects: heading, card reveal and stacking ---------- */
+  gsap.from('.work-title, .work-count', {
+    yPercent: 60, opacity: 0, duration: 1.2, ease: 'expo.out', stagger: 0.1,
+    scrollTrigger: { trigger: '.work-head', start: 'top 85%' },
+  });
+  const cards = gsap.utils.toArray('.project');
+  cards.forEach((card, i) => {
+    // content slides in when the card arrives
+    gsap.from(card.querySelectorAll('.p-top, .p-title, .p-tagline, .p-desc, .p-tags, .p-links'), {
+      y: 40, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.07,
+      scrollTrigger: { trigger: card, start: 'top 75%' },
+    });
+    gsap.from(card.querySelector('.p-window'), {
+      y: 80, opacity: 0, duration: 1.3, ease: 'expo.out',
+      scrollTrigger: { trigger: card, start: 'top 75%' },
+    });
+    gsap.from(card.querySelector('.p-float'), {
+      y: 60, x: 30, opacity: 0, duration: 1.3, delay: 0.25, ease: 'expo.out',
+      scrollTrigger: { trigger: card, start: 'top 75%' },
+    });
+    // on larger screens the card shrinks and dims as the next one slides over it
+    const next = cards[i + 1];
+    if (next) {
+      ScrollTrigger.matchMedia({
+        '(min-width: 761px)': () => {
+          gsap.to(card, {
+            scale: 0.93, filter: 'brightness(.6)', ease: 'none',
+            scrollTrigger: { trigger: next, start: 'top 55%', end: 'top 92px', scrub: true },
+          });
+        },
+      });
+    }
+  });
+
   /* ---------- generic reveals ---------- */
-  gsap.utils.toArray('.label, .stats > div, .row, .mail, .foot').forEach((el) => {
+  gsap.utils.toArray('.label, .stats > div, .mail, .foot').forEach((el) => {
     gsap.from(el, {
       y: 50, opacity: 0, duration: 1, ease: 'power3.out',
       scrollTrigger: { trigger: el, start: 'top 98%' },
