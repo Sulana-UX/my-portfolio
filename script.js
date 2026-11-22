@@ -152,7 +152,9 @@ function initAnimations() {
     .to('.hero-meta', { opacity: 0, y: -40, ease: 'none' }, 0);
 
   /* ---------- marquee: direction follows scroll ---------- */
-  const marquee = gsap.to('#marquee', { xPercent: -50, duration: 22, ease: 'none', repeat: -1 });
+  const marquee = gsap.timeline({ repeat: -1 })
+    .to('#marquee', { xPercent: -50, duration: 30, ease: 'none' }, 0)
+    .fromTo('#marquee2', { xPercent: -50 }, { xPercent: 0, duration: 30, ease: 'none' }, 0);
   ScrollTrigger.create({
     onUpdate: (self) => {
       gsap.to(marquee, { timeScale: self.direction * 3, duration: 0.2, overwrite: true });

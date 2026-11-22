@@ -123,15 +123,30 @@ body::after {
 
 /* ---------------- MARQUEE ---------------- */
 .marquee {
-  background: var(--accent); color: var(--dark); overflow: hidden;
-  transform: rotate(-2deg) scale(1.04); margin: -1.4rem 0 0; position: relative; z-index: 5;
-  border-top: 2px solid var(--dark); border-bottom: 2px solid var(--dark);
+  position: relative; z-index: 5; overflow: hidden; padding: 2.6rem 0 2.4rem;
+  background: var(--paper);
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }
 .marquee-track {
-  display: flex; align-items: center; gap: 2.2rem; width: max-content; padding: 1.1rem 0;
-  font-family: var(--display); font-size: clamp(2rem, 5vw, 4rem); text-transform: uppercase; line-height: 1;
+  display: flex; align-items: center; gap: 2.4rem; width: max-content;
+  font-family: var(--display); font-size: clamp(2.4rem, 5.4vw, 4.6rem); text-transform: uppercase; line-height: 1;
+  color: var(--ink);
 }
-.marquee-track i { font-style: normal; font-size: .6em; }
+.marquee-track span { transition: color .3s, -webkit-text-stroke-color .3s; }
+.marquee-track .o { color: transparent; -webkit-text-stroke: 1.2px rgba(239,235,228,.55); }
+.marquee-track i {               /* small glowing 4-point star */
+  flex: 0 0 auto; width: .32em; height: .32em; background: var(--accent);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 8px rgba(255,74,28,.8));
+}
+.marquee-track.sub {
+  margin-top: 1.3rem; gap: 1.6rem;
+  font-family: var(--sans); font-size: clamp(.8rem, 1.1vw, .95rem); font-weight: 500; letter-spacing: .18em; color: var(--muted);
+}
+.marquee-track.sub b { font-weight: 400; color: var(--accent); }
+.marquee:hover .marquee-track span:hover { color: var(--accent); -webkit-text-stroke-color: var(--accent); }
 
 /* ---------------- SECTIONS ---------------- */
 .label { font-size: .85rem; color: var(--muted); letter-spacing: .04em; margin-bottom: 3rem; }
