@@ -202,7 +202,7 @@ body::after {
 }
 .p-main { width: 100%; height: 100%; object-fit: contain; display: block; transition: opacity .35s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
 .p-main.swap { opacity: 0; transform: scale(1.02); }
-.project:hover .p-main { transform: scale(1.015); }
+
 .p-count {
   position: absolute; left: 12px; bottom: 12px; font: 600 .7rem var(--sans); letter-spacing: .1em;
   padding: .35rem .6rem; border-radius: 8px; background: rgba(10,10,12,.72); color: #d8d4cc; backdrop-filter: blur(8px);
@@ -221,7 +221,7 @@ body:has(.p-gallery:hover) .cursor { opacity: 0 !important; }
   background: #0b0b0d; border: 2px solid #2c2b31; opacity: .55;
   transition: opacity .3s, border-color .3s, transform .3s;
 }
-.p-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.p-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .p-thumb:hover { opacity: .9; transform: translateY(-2px); }
 .p-thumb.on { opacity: 1; border-color: var(--pc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--pc) 22%, transparent); }
 
