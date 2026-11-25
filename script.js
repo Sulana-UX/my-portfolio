@@ -283,9 +283,31 @@ function initAnimations() {
     const cx = gsap.quickTo(cursor, 'x', { duration: 0.35, ease: 'power3' });
     const cy = gsap.quickTo(cursor, 'y', { duration: 0.35, ease: 'power3' });
     addEventListener('mousemove', (e) => { cursor.style.opacity = 1; cx(e.clientX); cy(e.clientY); });
-    document.querySelectorAll('a').forEach((a) => {
+    document.querySelectorAll('a, .theme-btn').forEach((a) => {
       a.addEventListener('mouseenter', () => cursor.classList.add('big'));
       a.addEventListener('mouseleave', () => cursor.classList.remove('big'));
     });
   }
 }
+
+/* ---------- dark / light theme ---------- */
+(() => {
+  const root = document.documentElement;
+  const btn = document.getElementById('themeBtn');
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const sync = () => {
+    const light = root.dataset.theme === 'light';
+    btn.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+    if (meta) meta.content = light ? '#f3efe8' : '#0d0d0d';
+  };
+  sync();
+  btn.addEventListener('click', () => {
+    const light = root.dataset.theme !== 'light';
+    root.classList.add('theme-anim');
+    if (light) root.dataset.theme = 'light'; else delete root.dataset.theme;
+    try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (e) {}
+    sync();
+    clearTimeout(btn._t);
+    btn._t = setTimeout(() => root.classList.remove('theme-anim'), 600);
+  });
+})();
