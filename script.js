@@ -311,3 +311,231 @@ function initAnimations() {
     btn._t = setTimeout(() => root.classList.remove('theme-anim'), 600);
   });
 })();
+
+/* ---------- interactive terminal (easter egg) ---------- */
+(() => {
+  const term = document.getElementById('term');
+  const launch = document.getElementById('termLaunch');
+  const out = document.getElementById('termOut');
+  const body = document.getElementById('termBody');
+  const form = document.getElementById('termForm');
+  const input = document.getElementById('termIn');
+  const canvas = document.getElementById('termMatrix');
+  const LINKS = { github: 'https://github.com/Sulana-UX', linkedin: 'https://www.linkedin.com/in/sulana-uduwana' };
+  const history = []; let hIdx = 0; let booted = false; let busy = false;
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const pad = (s, n) => esc(s) + '&nbsp;'.repeat(Math.max(1, n - s.length));
+  const print = (html = '', cls = '') => {
+    const p = document.createElement('div');
+    p.className = 'tl' + (cls ? ' ' + cls : '');
+    p.innerHTML = html || '&nbsp;';
+    out.appendChild(p);
+    body.scrollTop = body.scrollHeight;
+    return p;
+  };
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const typeOut = async (lines, delay = 45) => { for (const l of lines) { print(l); await sleep(delay); } };
+
+  /* project data is read from the page, so the terminal stays in sync with the cards */
+  const projects = () => [...document.querySelectorAll('.project')].map((c) => ({
+    name: c.querySelector('.p-title').lastChild.textContent.trim(),
+    tag: c.querySelector('.p-tagline').textContent.trim(),
+    tags: [...c.querySelectorAll('.p-tags li')].map((t) => t.textContent),
+    links: [...c.querySelectorAll('.p-link')].map((a) => ({ label: a.firstChild.textContent.trim(), href: a.href })),
+    el: c,
+  }));
+  const link = (href, label) => `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(label)}</a>`;
+  const k = (s) => `<span class="k">${s}</span>`;
+
+  const COMMANDS = {
+    help: 'list all commands',
+    whoami: 'who is Sulana?',
+    projects: 'list my projects',
+    open: 'open a project, e.g. open 1',
+    skills: 'tech I work with',
+    contact: 'send me a message',
+    github: 'open my GitHub',
+    linkedin: 'open my LinkedIn',
+    theme: 'switch dark / light',
+    hack: 'try it ;)',
+    'sudo hire-me': '...',
+    clear: 'clear the screen',
+    exit: 'close the terminal',
+  };
+
+  function openMail() {
+    setTimeout(() => { close(); openComposer({ preventDefault() {}, currentTarget: launch }); }, 650);
+  }
+
+  const run = {
+    help() {
+      print('Available commands:', 'dim');
+      Object.entries(COMMANDS).forEach(([c, d]) => print('  ' + k(pad(c, 15)) + `<span class="dim">${d}</span>`));
+    },
+    async whoami() {
+      await typeOut([
+        '<span class="hl">Sulana Uduwana</span> — Software Engineer, Sri Lanka',
+        'Full-stack web &amp; mobile apps, built with a <span class="hl">security-first</span> mindset.',
+        'React · Node.js · Python · Flutter · Firebase · FastAPI',
+        `<span class="ok">●</span> Available for work — type ${k('contact')} to say hi.`,
+      ], 90);
+    },
+    projects() {
+      projects().forEach((p, i) => print(`  ${k('[' + (i + 1) + ']')} <span class="hl">${esc(p.name)}</span> <span class="dim">— ${esc(p.tag)}</span>`));
+      print(`Type ${k('open &lt;number&gt;')} to jump to one.`, 'dim');
+    },
+    open(arg) {
+      const list = projects();
+      const n = parseInt(arg, 10);
+      const p = list[n - 1] || (arg && list.find((x) => x.name.toLowerCase().startsWith(arg.toLowerCase())));
+      if (!p) { print(`open: project not found. Try ${k('open 1')} to ${k('open ' + list.length)}.`, 'err'); return; }
+      print(`Opening <span class="hl">${esc(p.name)}</span> …`);
+      print('  stack: ' + p.tags.map(esc).join(', '), 'dim');
+      print('  ' + p.links.map((l) => link(l.href, l.label + ' ↗')).join('   '));
+      setTimeout(() => { close(); p.el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1400);
+    },
+    skills() {
+      const bar = (n) => '<span class="ok">' + '█'.repeat(n) + '</span><span class="dim">' + '░'.repeat(10 - n) + '</span>';
+      [['Frontend', 'React, Vite, Flutter, GSAP', 9], ['Backend', 'Node.js, Express, FastAPI, Python', 8],
+       ['Data', 'Firebase, Firestore, Supabase, SQLAlchemy', 8], ['Security', 'JWT, Argon2, OWASP, forensics', 9]]
+        .forEach(([g, t, n]) => print('  ' + k(pad(g, 10)) + bar(n) + `&nbsp;&nbsp;<span class="dim">${t}</span>`));
+      const all = new Set(projects().flatMap((p) => p.tags));
+      print(`  ${all.size} technologies across my projects.`, 'dim');
+    },
+    contact() { print('Opening a new message … <span class="ok">✓</span>'); openMail(); },
+    github() { print('→ ' + link(LINKS.github, LINKS.github)); window.open(LINKS.github, '_blank', 'noopener'); },
+    linkedin() { print('→ ' + link(LINKS.linkedin, LINKS.linkedin)); window.open(LINKS.linkedin, '_blank', 'noopener'); },
+    theme(arg) {
+      const light = document.documentElement.dataset.theme === 'light';
+      const want = arg === 'light' || arg === 'dark' ? arg : (light ? 'dark' : 'light');
+      if ((want === 'light') !== light) document.getElementById('themeBtn').click();
+      print(`Theme set to <span class="hl">${want}</span>.`);
+    },
+    async hack() {
+      await typeOut([
+        '<span class="dim">$ nmap -sV sulana-portfolio.local</span>',
+        'Scanning 1 host … ports 22, 80, 443 open',
+        '<span class="dim">$ ./exploit --target mainframe</span>',
+        'Bypassing firewall ██████████ 100%',
+      ], 320);
+      await matrix(2600);
+      print('<span class="ok">ACCESS GRANTED.</span> Just kidding — this site is hardened 😎', 'win');
+      print(`Real security work: ${k('open traceMind')} or ${k('open expensewise')}.`, 'dim');
+    },
+    async 'sudo hire-me'() {
+      print('[sudo] password for recruiter: ********', 'dim');
+      await sleep(700);
+      await typeOut([
+        '<span class="ok">✓</span> Permission granted.',
+        '<span class="ok">✓</span> Coffee ready ☕',
+        '<span class="ok">✓</span> Opening a message to Sulana …',
+      ], 400);
+      openMail();
+    },
+    sudo() { print(`Nice try. Did you mean ${k('sudo hire-me')}?`, 'err'); },
+    clear() { out.innerHTML = ''; },
+    exit() { close(); },
+    ls() { print(`${k('about/')}&nbsp;&nbsp;${k('projects/')}&nbsp;&nbsp;${k('skills.txt')}&nbsp;&nbsp;${k('contact.sh')}&nbsp;&nbsp;<span class="dim">secret.txt</span>`); },
+    cat(arg) {
+      if (arg && arg.toLowerCase() === 'secret.txt') print(`🥚 You found the easter egg! Now type ${k('sudo hire-me')}.`);
+      else if (arg) print(`cat: ${esc(arg)}: no such file. Try ${k('cat secret.txt')}`, 'err');
+      else print('usage: cat &lt;file&gt;', 'dim');
+    },
+    date() { print(esc(new Date().toString())); },
+    echo(arg) { print(esc(arg || '')); },
+  };
+  const aliases = { about: 'whoami', '?': 'help', cls: 'clear', quit: 'exit', mail: 'contact', email: 'contact', dir: 'ls', work: 'projects' };
+
+  async function exec(raw) {
+    const line = raw.trim();
+    print(`<span class="ps"><b>sulana@portfolio</b>:<em>~</em>$</span> ${esc(line)}`);
+    if (!line) return;
+    history.push(line); hIdx = history.length;
+    const lower = line.toLowerCase().replace(/\s+/g, ' ');
+    if (run[lower] && lower.includes(' ')) return run[lower]();
+    const parts = line.split(/\s+/);
+    const cmd = aliases[parts[0].toLowerCase()] || parts[0].toLowerCase();
+    const arg = parts.slice(1).join(' ') || undefined;
+    if (Object.prototype.hasOwnProperty.call(run, cmd)) return run[cmd](arg);
+    print(`command not found: ${esc(parts[0])} — type ${k('help')}`, 'err');
+  }
+
+  /* green "matrix" rain over the terminal */
+  function matrix(ms) {
+    return new Promise((resolve) => {
+      const ctx = canvas.getContext('2d');
+      canvas.hidden = false;
+      const w = (canvas.width = body.clientWidth), h = (canvas.height = body.clientHeight);
+      const fs = 15, drops = Array.from({ length: Math.ceil(w / fs) }, () => Math.random() * -25);
+      const chars = 'アイウエオカキクケコサシスセソ01SULANA<>/{}#$';
+      const t0 = performance.now();
+      (function frame(t) {
+        ctx.fillStyle = 'rgba(8,10,9,.16)'; ctx.fillRect(0, 0, w, h);
+        ctx.font = fs + 'px monospace';
+        drops.forEach((y, i) => {
+          ctx.fillStyle = Math.random() > 0.95 ? '#eaffea' : '#39ff7a';
+          ctx.fillText(chars[(Math.random() * chars.length) | 0], i * fs, y * fs);
+          drops[i] = y * fs > h && Math.random() > 0.95 ? 0 : y + 1;
+        });
+        if (t - t0 < ms) requestAnimationFrame(frame);
+        else { canvas.hidden = true; ctx.clearRect(0, 0, w, h); resolve(); }
+      })(t0);
+    });
+  }
+
+  async function boot() {
+    booted = true;
+    await typeOut([
+      `<span class="dim">Last login: ${esc(new Date().toDateString())} on ttys001</span>`,
+      'Welcome to <span class="hl">Sulana\'s portfolio</span> terminal.',
+      `Type ${k('help')} to see what I can do. Try ${k('hack')} or ${k('sudo hire-me')} 😉`,
+      '',
+    ], 140);
+  }
+
+  function open() {
+    term.hidden = false;
+    document.documentElement.style.overflow = 'hidden';
+    requestAnimationFrame(() => term.classList.add('open'));
+    setTimeout(() => input.focus({ preventScroll: true }), 60);
+    if (!booted) { busy = true; boot().then(() => { busy = false; }); }
+  }
+  function close() {
+    if (term.hidden) return;
+    term.classList.remove('open');
+    document.documentElement.style.overflow = '';
+    setTimeout(() => { term.hidden = true; }, 260);
+    launch.focus({ preventScroll: true });
+  }
+
+  launch.addEventListener('click', open);
+  document.getElementById('termClose').addEventListener('click', close);
+  term.addEventListener('click', (e) => { if (e.target === term) close(); });
+  body.addEventListener('click', (e) => { if (e.target.tagName !== 'A' && !getSelection().toString()) input.focus({ preventScroll: true }); });
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (busy) return;
+    const v = input.value; input.value = '';
+    busy = true;
+    try { await exec(v); } finally { busy = false; }
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp' && history.length) { e.preventDefault(); hIdx = Math.max(0, hIdx - 1); input.value = history[hIdx]; }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); hIdx = Math.min(history.length, hIdx + 1); input.value = history[hIdx] || ''; }
+    else if (e.key === 'Tab') {
+      e.preventDefault();
+      const v = input.value.toLowerCase();
+      if (!v) return;
+      const hit = Object.keys(COMMANDS).filter((c) => c.startsWith(v));
+      if (hit.length === 1) input.value = hit[0];
+      else if (hit.length > 1) print(hit.join('&nbsp;&nbsp;&nbsp;'), 'dim');
+    } else if (e.key.toLowerCase() === 'l' && e.ctrlKey) { e.preventDefault(); out.innerHTML = ''; }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!term.hidden && e.key === 'Escape') { close(); return; }
+    const el = document.activeElement;
+    const typing = el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
+    if (term.hidden && !typing && (e.key === '`' || (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey)))) { e.preventDefault(); open(); }
+  });
+})();
