@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
 
   <!-- favicon -->
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -20,7 +20,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sulana-ux.github.io/my-portfolio/">
   <meta property="og:title" content="Sulana Uduwana — Software Engineer">
-  <meta property="og:description" content="Full-stack web & mobile apps, built with a security-first mindset. See my projects: Cineverse, TraceMind AI and ExpenseWise.">
+  <meta property="og:description" content="Full-stack web & mobile apps, built with a security-first mindset. See my projects: Monsoon Ridge, Cineverse, TraceMind AI and ExpenseWise.">
   <meta property="og:image" content="https://sulana-ux.github.io/my-portfolio/assets/og-image.jpg">
   <meta property="og:image:secure_url" content="https://sulana-ux.github.io/my-portfolio/assets/og-image.jpg">
   <meta property="og:image:type" content="image/jpeg">
@@ -110,7 +110,7 @@
       and experiences people enjoy using.
     </p>
     <div class="stats">
-      <div><strong>03</strong><span>Featured projects</span></div>
+      <div><strong>04</strong><span>Featured projects</span></div>
       <div><strong>10+</strong><span>Technologies used</span></div>
       <div><strong>02</strong><span>Live products</span></div>
     </div>
@@ -121,10 +121,46 @@
     <div class="work-head">
       <p class="label">(02) — Selected Work</p>
       <h2 class="work-title">Featured <em>projects</em></h2>
-      <p class="work-count">03</p>
+      <p class="work-count">04</p>
     </div>
 
     <div class="projects">
+      <article class="project" style="--pc:#a3d45c">
+        <div class="p-gallery">
+          <div class="p-stage">
+            <img class="p-main" src="assets/projects/monsoon-1.webp" alt="Monsoon Ridge — Home page, evening view" loading="lazy" decoding="async">
+            <span class="p-count">01 / 06</span>
+            <button type="button" class="p-expand" aria-label="View full screen">⤢</button>
+          </div>
+          <div class="p-thumbs">
+            <button type="button" class="p-thumb on" data-src="assets/projects/monsoon-1.webp" aria-label="Show Home page, evening view"><img src="assets/projects/monsoon-1-t.webp" alt="" loading="lazy"></button>
+            <button type="button" class="p-thumb" data-src="assets/projects/monsoon-2.webp" aria-label="Show Rooms with filters and ratings"><img src="assets/projects/monsoon-2-t.webp" alt="" loading="lazy"></button>
+            <button type="button" class="p-thumb" data-src="assets/projects/monsoon-3.webp" aria-label="Show Room details"><img src="assets/projects/monsoon-3-t.webp" alt="" loading="lazy"></button>
+            <button type="button" class="p-thumb" data-src="assets/projects/monsoon-4.webp" aria-label="Show Booking with the exact price"><img src="assets/projects/monsoon-4-t.webp" alt="" loading="lazy"></button>
+            <button type="button" class="p-thumb" data-src="assets/projects/monsoon-5.webp" aria-label="Show Staff dashboard overview"><img src="assets/projects/monsoon-5-t.webp" alt="" loading="lazy"></button>
+            <button type="button" class="p-thumb" data-src="assets/projects/monsoon-6.webp" aria-label="Show Housekeeping board"><img src="assets/projects/monsoon-6-t.webp" alt="" loading="lazy"></button>
+          </div>
+        </div>
+        <div class="p-info">
+          <span class="p-badge">🌿 Team project</span>
+          <h3 class="p-title"><span class="p-num">01</span>Monsoon Ridge</h3>
+          <p class="p-tagline">Jungle Resort Booking &amp; Staff Dashboard</p>
+          <p class="p-desc">Full-stack hotel website and front-desk dashboard for a fictional jungle resort in Sri Lanka: online booking with live pricing, offers and promo codes, guest reviews, invoices, emails and reports.</p>
+          <p class="p-sub">Key features</p>
+          <ul class="p-feats">
+            <li>Online booking with live availability, seasonal and weekend pricing and promo codes</li>
+            <li>Front desk: check-in and check-out, walk-ins, housekeeping board and guest bills</li>
+            <li>Guests can change or cancel bookings, print invoices and review their stay</li>
+            <li>Revenue reports, CSV export, staff roles and a tamper-proof activity log</li>
+            <li>Server-side pricing and transactions, so a room can never be double-booked</li>
+          </ul>
+          <ul class="p-tags"><li>React</li><li>Vite</li><li>Node.js</li><li>Express</li><li>Firebase</li><li>Firestore</li></ul>
+          <div class="p-links">
+            <a class="p-link main" href="https://github.com/Sulana-UX/monsoon-ridge" target="_blank" rel="noopener">GitHub <span>→</span></a>
+          </div>
+        </div>
+      </article>
+
       <article class="project" style="--pc:#e2b34a">
         <div class="p-gallery">
           <div class="p-stage">
@@ -141,7 +177,7 @@
         </div>
         <div class="p-info">
           <span class="p-badge live">● Live project</span>
-          <h3 class="p-title"><span class="p-num">01</span>Cineverse</h3>
+          <h3 class="p-title"><span class="p-num">02</span>Cineverse</h3>
           <p class="p-tagline">Luxury Cinema Booking</p>
           <p class="p-desc">Full-stack cinema website with a four-step booking flow, a live seat map that updates as other guests choose, online payment and an admin dashboard for films, showtimes, check-in and refunds.</p>
           <p class="p-sub">Key features</p>
@@ -176,7 +212,7 @@
         </div>
         <div class="p-info">
           <span class="p-badge ">🔍 Personal project</span>
-          <h3 class="p-title"><span class="p-num">02</span>TraceMind AI</h3>
+          <h3 class="p-title"><span class="p-num">03</span>TraceMind AI</h3>
           <p class="p-tagline">Digital Evidence Story Builder</p>
           <p class="p-desc">Local-first cybersecurity and digital forensics platform that correlates multi-source security logs, reconstructs the attack timeline and builds an audit-ready incident report — no cloud or paid APIs.</p>
           <p class="p-sub">Key features</p>
@@ -209,7 +245,7 @@
         </div>
         <div class="p-info">
           <span class="p-badge ">🛡️ Personal project</span>
-          <h3 class="p-title"><span class="p-num">03</span>ExpenseWise</h3>
+          <h3 class="p-title"><span class="p-num">04</span>ExpenseWise</h3>
           <p class="p-tagline">Secure Expense Tracker</p>
           <p class="p-desc">Full-stack personal finance app for mobile and web with budgets, analytics and transaction tracking, built on a security-hardened API that resists common OWASP attacks.</p>
           <p class="p-sub">Key features</p>
@@ -278,6 +314,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>
